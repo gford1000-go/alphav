@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
 	"strconv"
 
 	"github.com/gford1000-go/alphav/common"
@@ -190,6 +191,11 @@ func parseTimeSeries(i any, r *Data, o *Options) error {
 
 		tm = append(tm, ele)
 	}
+
+	// Sort is descending ... most recent date first
+	slices.SortFunc(tm, func(a, b *Element) int {
+		return b.Timestamp.Compare(a.Timestamp)
+	})
 
 	r.TimeSeries = tm
 	return nil
