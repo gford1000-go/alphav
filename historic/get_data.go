@@ -180,7 +180,7 @@ func parseTimeSeries(i any, r *Data, o *Options) error {
 
 	// Sort is descending ... most recent date first
 	slices.SortFunc(tm, func(a, b *Element) int {
-		return int(b.Date.Sub(a.Date))
+		return b.Date.Compare(a.Date)
 	})
 
 	r.TimeSeries = tm
