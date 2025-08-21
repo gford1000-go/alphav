@@ -99,7 +99,7 @@ func parseMetadata(m *metaJSON, r *Data, o *Options) error {
 	}
 
 	var err error
-	im.LastRefresh, err = common.ParseIntradayDate(m.Refresh)
+	im.LastRefresh, err = common.ParseDate(m.Refresh)
 	if err != nil {
 		return err
 	}
