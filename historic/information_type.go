@@ -26,7 +26,7 @@ func (i InformationType) String() string {
 	case Close:
 		return "close"
 	case Volume:
-		return "volumne"
+		return "volume"
 	case AdjustedClose:
 		return "adjusted close"
 	case DividendAmount:
@@ -48,10 +48,10 @@ func (i InformationType) toAVString() string {
 		return "3. low"
 	case Close:
 		return "4. close"
-	case Volume:
-		return "5. volume"
 	case AdjustedClose:
-		return "6. adjusted close"
+		return "5. adjusted close"
+	case Volume:
+		return "6. volume"
 	case DividendAmount:
 		return "7. dividend amount"
 	case SplitCoefficient:

@@ -39,3 +39,10 @@ type Data struct {
 	// TimeSeries is an ordered set of data
 	TimeSeries []*Element
 }
+
+func (d *Data) isValid() bool {
+	if len(d.TimeSeries) == 0 || d.Meta == nil || len(d.Meta.Information) == 0 {
+		return false
+	}
+	return true
+}

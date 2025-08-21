@@ -19,3 +19,6 @@ var ErrInvalidInterval = errors.New("invalid interval specified")
 
 // ErrInvalidInformationType returned when an invalid information type is specified
 var ErrInvalidInformationType = errors.New("invalid information type specified")
+
+// ErrContextEnded returned when the context is ended before completion
+var ErrContextEnded = errors.New("context ended before completion")
