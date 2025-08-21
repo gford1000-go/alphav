@@ -1,4 +1,4 @@
-package intraday
+package common
 
 import "errors"
 

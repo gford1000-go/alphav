@@ -7,7 +7,8 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-	"time"
+
+	"github.com/gford1000-go/alphav/common"
 )
 
 // metaJSON captures returned metadata, so it can be parsed
@@ -55,28 +56,28 @@ func GetData(symbol, apiKey string, opts ...func(*Options) error) (*Data, error)
 
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil, fmt.Errorf("%v: %w", err, ErrRemoteCallError)
+		return nil, fmt.Errorf("%v: %w", err, common.ErrRemoteCallError)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("%s: %w", resp.Status, ErrRemoteCallError)
+		return nil, fmt.Errorf("%s: %w", resp.Status, common.ErrRemoteCallError)
 	}
 
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("%v: %w", err, ErrRemoteCallError)
+		return nil, fmt.Errorf("%v: %w", err, common.ErrRemoteCallError)
 	}
 
 	var d respJSON
 	if err = json.Unmarshal(b, &d); err != nil {
-		return nil, fmt.Errorf("%v: %w", err, ErrParseError)
+		return nil, fmt.Errorf("%v: %w", err, common.ErrParseError)
 	}
 	if d.Err != nil {
-		return nil, fmt.Errorf("api error: %s: %w", *d.Err, ErrRemoteCallError)
+		return nil, fmt.Errorf("api error: %s: %w", *d.Err, common.ErrRemoteCallError)
 	}
 	if d.Info != nil {
-		return nil, fmt.Errorf("api error: %s: %w", *d.Info, ErrRemoteCallError)
+		return nil, fmt.Errorf("api error: %s: %w", *d.Info, common.ErrRemoteCallError)
 	}
 
 	result := &Data{
@@ -84,37 +85,37 @@ func GetData(symbol, apiKey string, opts ...func(*Options) error) (*Data, error)
 		TimeSeries: []*Element{},
 	}
 
-	if err := parseIntradayMetadata(d.Meta, result, &o); err != nil {
-		return nil, fmt.Errorf("%v: %w", err, ErrMetadataParseError)
+	if err := parseMetadata(d.Meta, result, &o); err != nil {
+		return nil, fmt.Errorf("%v: %w", err, common.ErrMetadataParseError)
 	}
 
 	switch o.Interval {
 	case OneMin:
-		if err := parseIntradayTimeSeries(d.TS1, result, &o); err != nil {
-			return nil, fmt.Errorf("%v: %w", err, ErrTimeSeriesParseError)
+		if err := parseTimeSeries(d.TS1, result, &o); err != nil {
+			return nil, fmt.Errorf("%v: %w", err, common.ErrTimeSeriesParseError)
 		}
 	case FiveMin:
-		if err := parseIntradayTimeSeries(d.TS5, result, &o); err != nil {
-			return nil, fmt.Errorf("%v: %w", err, ErrTimeSeriesParseError)
+		if err := parseTimeSeries(d.TS5, result, &o); err != nil {
+			return nil, fmt.Errorf("%v: %w", err, common.ErrTimeSeriesParseError)
 		}
 	case FifteenMin:
-		if err := parseIntradayTimeSeries(d.TS15, result, &o); err != nil {
-			return nil, fmt.Errorf("%v: %w", err, ErrTimeSeriesParseError)
+		if err := parseTimeSeries(d.TS15, result, &o); err != nil {
+			return nil, fmt.Errorf("%v: %w", err, common.ErrTimeSeriesParseError)
 		}
 	case ThirtyMin:
-		if err := parseIntradayTimeSeries(d.TS30, result, &o); err != nil {
-			return nil, fmt.Errorf("%v: %w", err, ErrTimeSeriesParseError)
+		if err := parseTimeSeries(d.TS30, result, &o); err != nil {
+			return nil, fmt.Errorf("%v: %w", err, common.ErrTimeSeriesParseError)
 		}
 	case SixtyMin:
-		if err := parseIntradayTimeSeries(d.TS60, result, &o); err != nil {
-			return nil, fmt.Errorf("%v: %w", err, ErrTimeSeriesParseError)
+		if err := parseTimeSeries(d.TS60, result, &o); err != nil {
+			return nil, fmt.Errorf("%v: %w", err, common.ErrTimeSeriesParseError)
 		}
 	}
 
 	return result, nil
 }
 
-func parseIntradayMetadata(m *metaJSON, r *Data, o *Options) error {
+func parseMetadata(m *metaJSON, r *Data, o *Options) error {
 	im := &Metadata{
 		Information: append([]InformationType{}, o.Information...),
 		Symbol:      m.Symbol,
@@ -127,7 +128,7 @@ func parseIntradayMetadata(m *metaJSON, r *Data, o *Options) error {
 	}
 	im.RefreshInterval = interval
 
-	im.LastRefresh, err = parseIntradayDate(m.Refresh)
+	im.LastRefresh, err = common.ParseIntradayDate(m.Refresh)
 	if err != nil {
 		return err
 	}
@@ -136,11 +137,7 @@ func parseIntradayMetadata(m *metaJSON, r *Data, o *Options) error {
 	return nil
 }
 
-func parseIntradayDate(tmStr string) (time.Time, error) {
-	return time.Parse("2006-01-02 15:04:05", tmStr)
-}
-
-func parseIntradayTimeSeries(i any, r *Data, o *Options) error {
+func parseTimeSeries(i any, r *Data, o *Options) error {
 
 	if i == nil {
 		return errors.New("no data available to be parsed")
@@ -162,7 +159,7 @@ func parseIntradayTimeSeries(i any, r *Data, o *Options) error {
 			Data: map[InformationType]float64{},
 		}
 
-		t, err := parseIntradayDate(k)
+		t, err := common.ParseIntradayDate(k)
 		if err != nil {
 			return err
 		}
