@@ -3,6 +3,7 @@ package historic
 import (
 	"context"
 	"errors"
+	"fmt"
 	"slices"
 	"time"
 
@@ -34,7 +35,25 @@ var ErrInvalidNEles = errors.New("neles must be greater than zero and less than 
 
 type WindowFunc func(ctx context.Context, data *Data, offset, windowLen int, it InformationType) *WindowedElement
 
-func GetWindowedCalculation(ctx context.Context, data *Data, windowLength int, it InformationType, calcMap map[string]WindowFunc) (*WindowedResult, error) {
+type WindowedCalculationOptions struct {
+	NumberOfDataPoints int
+}
+
+var defaultWindowedCalculationOptions = WindowedCalculationOptions{
+	NumberOfDataPoints: 0,
+}
+
+func WithNumberOfDataPoints(n int) func(*WindowedCalculationOptions) error {
+	return func(wco *WindowedCalculationOptions) error {
+		if n < 0 {
+			return fmt.Errorf("invalid number of data points: %d", n)
+		}
+		wco.NumberOfDataPoints = n
+		return nil
+	}
+}
+
+func GetWindowedCalculation(ctx context.Context, data *Data, windowLength int, it InformationType, calcMap map[string]WindowFunc, opts ...func(*WindowedCalculationOptions) error) (*WindowedResult, error) {
 
 	if data == nil || !data.isValid() {
 		return nil, ErrInvalidData
@@ -63,6 +82,15 @@ func GetWindowedCalculation(ctx context.Context, data *Data, windowLength int, i
 		return result, nil
 	}
 
+	var o = defaultWindowedCalculationOptions
+	o.NumberOfDataPoints = len(data.TimeSeries) // Process all data by default
+
+	for _, opt := range opts {
+		if err := opt(&o); err != nil {
+			return nil, err
+		}
+	}
+
 	for key, calc := range calcMap {
 		if calc == nil {
 			return nil, errors.New("calculation function is nil for " + key)
@@ -70,7 +98,13 @@ func GetWindowedCalculation(ctx context.Context, data *Data, windowLength int, i
 		result.TimeSeries[key] = []*WindowedElement{}
 	}
 
-	for i := 0; i < len(data.TimeSeries)-windowLength; i++ {
+	// Make sure that the number of data points does not mean we walk off the end of the time series
+	var iterations = o.NumberOfDataPoints
+	if iterations > len(data.TimeSeries)-windowLength {
+		iterations = len(data.TimeSeries) - windowLength
+	}
+
+	for i := 0; i < iterations; i++ {
 		select {
 		case <-ctx.Done():
 			return nil, common.ErrContextEnded
