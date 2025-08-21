@@ -60,3 +60,10 @@ func (i InformationType) toAVString() string {
 		panic("invalid value of InformationType")
 	}
 }
+
+func (i InformationType) isValid() bool {
+	if i <= UnknownInformationType || i >= InvalidInformationType {
+		return false
+	}
+	return true
+}

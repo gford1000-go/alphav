@@ -13,3 +13,9 @@ var ErrMetadataParseError = errors.New("invalid metadata received")
 
 // ErrTimeSeriesParseError returned when time series parsing has errors
 var ErrTimeSeriesParseError = errors.New("invalid time series received")
+
+// ErrInvalidInterval returned when an invalid interval is specified
+var ErrInvalidInterval = errors.New("invalid interval specified")
+
+// ErrInvalidInformationType returned when an invalid information type is specified
+var ErrInvalidInformationType = errors.New("invalid information type specified")

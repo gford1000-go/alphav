@@ -3,6 +3,8 @@ package intraday
 import (
 	"fmt"
 	"time"
+
+	"github.com/gford1000-go/alphav/common"
 )
 
 // Options can change the returned Data from GetData
@@ -25,10 +27,10 @@ type Options struct {
 
 // WithInterval sets the interval between elements
 func WithInterval(interval Interval) func(*Options) error {
-	if interval <= UnknownInterval || interval > InvalidInterval {
-		panic(fmt.Sprintf("bad interval: %v", interval))
-	}
 	return func(o *Options) error {
+		if !interval.isValid() {
+			return common.ErrInvalidInterval
+		}
 		o.Interval = interval
 		return nil
 	}
@@ -68,6 +70,20 @@ func WithStartPoint(year, month int) func(*Options) error {
 		}
 		o.FromMonth = month
 		o.FromYear = year
+		return nil
+	}
+}
+
+// WithInformation sets the information types to be returned
+// If no information types are specified, all types are returned.
+func WithInformation(information ...InformationType) func(*Options) error {
+	return func(o *Options) error {
+		for _, i := range information {
+			if !i.isValid() {
+				return common.ErrInvalidInformationType
+			}
+		}
+		o.Information = append([]InformationType{}, o.Information...)
 		return nil
 	}
 }

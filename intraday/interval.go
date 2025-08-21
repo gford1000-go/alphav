@@ -47,3 +47,10 @@ func parseInterval(s string) (Interval, error) {
 		return UnknownInterval, fmt.Errorf("unparseable interval: %s", s)
 	}
 }
+
+func (i Interval) isValid() bool {
+	if i <= UnknownInterval || i >= InvalidInterval {
+		return false
+	}
+	return true
+}

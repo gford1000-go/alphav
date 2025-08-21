@@ -29,6 +29,13 @@ func (i InformationType) String() string {
 	}
 }
 
+func (i InformationType) isValid() bool {
+	if i <= UnknownIntradayInformationType || i >= InvalidIntradayInformationType {
+		return false
+	}
+	return true
+}
+
 func (i InformationType) toAVString() string {
 	switch i {
 	case Open:
