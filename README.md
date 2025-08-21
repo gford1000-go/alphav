@@ -3,9 +3,19 @@
 
 # alphav
 
-Provides a wrapper to [Alpha Vantage](https://www.alphavantage.co) api, specifically the `TIME_SERIES_INTRADAY` request.
+Provides a wrapper to the [Alpha Vantage](https://www.alphavantage.co) api.
+
+The following are supported:
+
+* `LISTING_STATUS`
+* `TIME_SERIES_INTRADAY`
+* `TIME_SERIES_DAILY_ADJUSTED` (requires a premium account)
+
+This allows the set of available tradeables to be retrieved, together with 20 year histories and recent intraday activity.
 
 Note: an API KEY is required to use the API, with free keys rate limited to 25 request/day.
+
+The package maintains a consistent behaviour across calls, for example:
 
 ```go
 func main() {
