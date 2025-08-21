@@ -8,6 +8,7 @@ import (
 
 	"github.com/gford1000-go/alphav/historic"
 	"github.com/gford1000-go/alphav/intraday"
+	"github.com/gford1000-go/alphav/listing"
 )
 
 func TestMain(m *testing.M) {
@@ -44,7 +45,6 @@ func ExampleGetIntradayData() {
 func ExampleGetHistoricData() {
 
 	apiKey := os.Getenv("AV_API_KEY")
-	fmt.Println("Using API Key:", apiKey)
 
 	ctx := Initialise(context.Background(), apiKey)
 
@@ -56,4 +56,20 @@ func ExampleGetHistoricData() {
 
 	// Output:
 	// 100
+}
+
+func ExampleGetActiveListing() {
+
+	apiKey := os.Getenv("AV_API_KEY")
+
+	ctx := Initialise(context.Background(), apiKey)
+
+	if data, err := GetActiveListing(ctx, listing.WithOnlyTypes([]listing.AssetType{listing.ETF})); err == nil {
+		fmt.Println(len(data.Tradeables) > 0)
+	} else {
+		fmt.Println(err)
+	}
+
+	// Output:
+	// true
 }
