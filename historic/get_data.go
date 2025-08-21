@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
 	"strconv"
 	"time"
 
@@ -176,6 +177,11 @@ func parseTimeSeries(i any, r *Data, o *Options) error {
 
 		tm = append(tm, ele)
 	}
+
+	// Sort is descending ... most recent date first
+	slices.SortFunc(tm, func(a, b *Element) int {
+		return int(b.Date.Sub(a.Date))
+	})
 
 	r.TimeSeries = tm
 	r.Meta.DataRange = dtRng
