@@ -23,7 +23,7 @@ func (i InformationType) String() string {
 	case Close:
 		return "close"
 	case Volume:
-		return "volumne"
+		return "volume"
 	default:
 		panic("invalid value of IntradayInformationType")
 	}
