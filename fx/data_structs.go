@@ -48,3 +48,18 @@ func (d *Data) isValid() bool {
 	}
 	return true
 }
+
+// IntradayData is the returned object from a call to GetIntraday
+type IntradayData struct {
+	// Meta describes the details of the data
+	Meta *Metadata
+	// Data holds the FX details for the currency pair
+	Data map[IntradayInformationType]float64
+}
+
+func (d *IntradayData) isValid() bool {
+	if len(d.Data) == 0 || d.Meta == nil || len(d.Meta.Information) == 0 {
+		return false
+	}
+	return true
+}

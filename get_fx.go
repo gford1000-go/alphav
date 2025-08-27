@@ -30,3 +30,24 @@ func GetFX(ctx context.Context, fromCurrency, toCurrency string, opts ...func(*f
 	return fx.GetData(fromCurrency, toCurrency, apiKey, opts...)
 
 }
+
+// GetIntradayFX returns data for the specified currency pair, using the api_key stored in the context.
+// This uses CURRENCY_EXCHANGE_RATE from https://www.alphavantage.co/documentation/
+func GetIntradayFX(ctx context.Context, fromCurrency, toCurrency string) (*fx.IntradayData, error) {
+
+	tracer := otel.Tracer(common.TracerName)
+
+	ctx, span := tracer.Start(ctx, "GetIntradayFX")
+	defer span.End()
+
+	span.SetAttributes(attribute.String("FromCurrency", fromCurrency))
+	span.SetAttributes(attribute.String("ToCurrency", toCurrency))
+
+	apiKey, err := getAPIKey(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return fx.GetIntraday(fromCurrency, toCurrency, apiKey)
+
+}
