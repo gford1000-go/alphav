@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/gford1000-go/alphav/fx"
 	"github.com/gford1000-go/alphav/historic"
 	"github.com/gford1000-go/alphav/intraday"
 	"github.com/gford1000-go/alphav/listing"
@@ -72,4 +73,20 @@ func ExampleGetActiveListing() {
 
 	// Output:
 	// true
+}
+
+func ExampleGetFX() {
+
+	apiKey := os.Getenv("AV_API_KEY")
+
+	ctx := Initialise(context.Background(), apiKey)
+
+	if data, err := GetFX(ctx, "EUR", "USD", fx.WithAllAvailableHistory(false)); err == nil {
+		fmt.Println(len(data.TimeSeries))
+	} else {
+		fmt.Println(err)
+	}
+
+	// Output:
+	// 100
 }

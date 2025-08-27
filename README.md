@@ -10,6 +10,7 @@ The following are supported:
 * `LISTING_STATUS`
 * `TIME_SERIES_INTRADAY`
 * `TIME_SERIES_DAILY_ADJUSTED` (requires a premium account)
+* `FX_DAILY`
 
 This allows the set of available tradeables to be retrieved, together with 20 year histories and recent intraday activity.
 
