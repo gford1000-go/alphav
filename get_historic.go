@@ -29,3 +29,23 @@ func GetHistoricData(ctx context.Context, symbol string, opts ...func(*historic.
 	return historic.GetData(symbol, apiKey, opts...)
 
 }
+
+// GetDividendData returns dividend data for the specified symbol, using the api_key stored in the context.
+// Uses DIVIDENDS function - see https://www.alphavantage.co/documentation/
+func GetDividendData(ctx context.Context, symbol string) (*historic.DividendData, error) {
+
+	tracer := otel.Tracer(common.TracerName)
+
+	ctx, span := tracer.Start(ctx, "GetDividendData")
+	defer span.End()
+
+	span.SetAttributes(attribute.String("Symbol", symbol))
+
+	apiKey, err := getAPIKey(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return historic.GetDividends(symbol, apiKey)
+
+}

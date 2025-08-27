@@ -12,6 +12,7 @@ The following are supported:
 * `TIME_SERIES_DAILY_ADJUSTED` (requires a premium account)
 * `FX_DAILY`
 * `CURRENCY_EXCHANGE_RATE`
+* `DIVIDENDS`
 
 This allows the set of available tradeables to be retrieved, together with 20 year histories and recent intraday activity.
 

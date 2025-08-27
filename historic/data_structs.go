@@ -46,3 +46,54 @@ func (d *Data) isValid() bool {
 	}
 	return true
 }
+
+// DividendDate allows for undefined date values to be identifiable in a series
+type DividendDate time.Time
+
+// IsUndefined returns true if the date was parseable from the timeseries details
+func (d DividendDate) IsUndefined() bool {
+	return d == undefinedDate
+}
+
+var undefinedDate = DividendDate(time.Date(9999, 12, 31, 0, 0, 0, 0, time.UTC))
+
+// Compare returns:
+//
+//	1 if d is greater than other
+//	0 if d is equal to other, or if either are undefined
+//	-1 if d is less than other
+func (d DividendDate) Compare(other DividendDate) int {
+	if d.IsUndefined() || other.IsUndefined() {
+		return 0
+	}
+	return time.Time(d).Compare(time.Time(other))
+}
+
+// DividendElement stores information related to a single dividend
+type DividendElement struct {
+	// RecordDate is the date that this information was stored
+	RecordDate DividendDate
+	// DeclarationDate is the date that the entity announced the dividend amount
+	DeclarationDate DividendDate
+	// ExDividendDate is the date on which ownership of the stock is determined, in terms of receipt of the amount
+	ExDividendDate DividendDate
+	// PaymentDate is the date on which the dividend is paid to the owner as identified on the ExDividendDate
+	PaymentDate DividendDate
+	// Amount is the amount of the dividend to be paid on the PaymentDate
+	Amount float64
+}
+
+// DividendData is the history of dividend payments for the Symbol
+type DividendData struct {
+	// Meta describes the details of the data
+	Meta *Metadata
+	// TimeSeries is an ordered set of data
+	TimeSeries []*DividendElement
+}
+
+func (d *DividendData) isValid() bool {
+	if len(d.TimeSeries) == 0 || d.Meta == nil {
+		return false
+	}
+	return true
+}
